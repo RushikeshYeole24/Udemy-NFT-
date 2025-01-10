@@ -1,37 +1,54 @@
 /* eslint-disable @next/next/no-img-element */
 
-
-import { Disclosure, Menu } from '@headlessui/react'
-import { BellIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import Link from 'next/link'
-import ActiveLink from '../link'
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import ActiveLink from '../link';
+import { useAccount, useNetwork } from '@hooks/web3';
+import Walletbar from './Walletbar';
+// import { useState } from 'react';
 
 const navigation = [
-  { name: 'Marketplace', href: '/', current: true },
-  { name: 'Create', href: '/nft/create', current: false }
-]
+  { name: "MarketPlace", href: "/", current: true },
+  { name: "Create", href: "/nft/create", current: false },
+  {name: "Community Platform", href: "/communityplatform/community", current:false},
+];
 
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function Navbar() {
+  const { account } = useAccount();
+  const { network } = useNetwork();
+
+  // State to manage theme
+  // const [isDarkMode] = useState(false);
+
+  // Toggle function for dark/light mode
+  // const toggleTheme = () => {
+  //   setIsDarkMode((prevMode) => !prevMode);
+  //   document.body.classList.toggle('bg-gray-800', !isDarkMode); // Apply dark mode class to body
+  //   document.body.classList.toggle('bg-white', isDarkMode); // Apply light mode class to body
+  //   document.body.classList.toggle('text-white', !isDarkMode); // Text color for dark mode
+  //   document.body.classList.toggle('text-gray-800', isDarkMode); // Text color for light mode
+  // };
+
   return (
-    <Disclosure as="nav" className="bg-gray-800">
+    <Disclosure as="nav" className={`bg-gray-800 ${ 'bg-gray-800' }`}>
       {({ open }) => (
         <>
           <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
             <div className="relative flex items-center justify-between h-16">
               <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
                 {/* Mobile menu button*/}
-                <Disclosure.Button className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                <DisclosureButton className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
                   ) : (
                     <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
                   )}
-                </Disclosure.Button>
+                </DisclosureButton>
               </div>
               <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex-shrink-0 flex items-center">
@@ -44,17 +61,14 @@ export default function Navbar() {
                 <div className="hidden sm:block sm:ml-6">
                   <div className="flex space-x-4">
                     {navigation.map((item) => (
-                      <ActiveLink 
-                      key={item.name}
-                      href={item.href}
-                      activeClass="bg-gray-900 text-white"
-                      
+                      <ActiveLink
+                        key={item.name}
+                        href={item.href}
+                        activeClass="bg-gray-900 text-white"
                       >
                         <a
-                          
-                          
                           className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                          aria-current={item.current ? 'page' : undefined}
+                          aria-current={item.current ? "page" : undefined}
                         >
                           {item.name}
                         </a>
@@ -64,69 +78,58 @@ export default function Navbar() {
                 </div>
               </div>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <button
-                  type="button"
-                  className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                <div className="text-gray-300 self-center mr-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-purple-100 text-purple-800">
+                    <svg className="-ml-0.5 mr-1.5 h-2 w-2 text-indigo-400" fill="currentColor" viewBox="0 0 8 8">
+                      <circle cx={4} cy={4} r={3} />
+                    </svg>
+                    {network.isLoading ?
+                      "Loading..." :
+                      account.isInstalled ?
+                      network.data :
+                      "Install Web3 Wallet"
+                    }
+                  </span>
+                </div>
+                <Walletbar
+                  isInstalled={account.isInstalled}
+                  isLoading={account.isLoading}
+                  connect={account.connect}
+                  account={account.data}
+                />
+                {/* Dark Mode / Light Mode Toggle Button */}
+                {/* <button
+                  onClick={toggleTheme}
+                  className="ml-4 text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
-
-                {/* Profile dropdown */}
-                <Menu as="div" className="ml-3 relative">
-                  <div>
-                    <Menu.Button className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
-                      <span className="sr-only">Open user menu</span>
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                        alt=""
-                      />
-                    </Menu.Button>
-                  </div>
-                  
-                  <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <Menu.Item>
-                      {({ active }) => (
-                        <Link href="/profile" legacyBehavior>
-                        <a
-                          
-                          className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                        >
-                          Your Profile
-                        </a>
-                        </Link>
-                      )}
-                    </Menu.Item>
-                    
-                    
-                  </Menu.Items>
-                  
-                </Menu>
+                  {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                </button> */}
               </div>
             </div>
           </div>
 
-          <Disclosure.Panel className="sm:hidden">
+          <DisclosurePanel className="sm:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {navigation.map((item) => (
-                <Disclosure.Button
+                <DisclosureButton
                   key={item.name}
                   as="a"
                   href={item.href}
                   className={classNames(
-                    item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                    'block px-3 py-2 rounded-md text-base font-medium'
+                    item.current
+                      ? "bg-gray-900 text-white"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                    "block px-3 py-2 rounded-md text-base font-medium"
                   )}
-                  aria-current={item.current ? 'page' : undefined}
+                  aria-current={item.current ? "page" : undefined}
                 >
                   {item.name}
-                </Disclosure.Button>
+                </DisclosureButton>
               ))}
             </div>
-          </Disclosure.Panel>
+          </DisclosurePanel>
         </>
       )}
     </Disclosure>
-  )
+  );
 }
